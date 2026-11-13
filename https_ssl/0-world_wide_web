@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Display DNS information for a domain's subdomains
+
+get_dns_info() {
+    local subdomain="$1"
+    local domain="$2"
+
+    dig +noall +answer "$subdomain.$domain" | awk -v subdomain="$subdomain" '{
+        print "The subdomain " subdomain " is a " $4 " record and points to " $5
+    }'
+}
+
+domain="$1"
+
+if [ "$#" -eq 2 ]; then
+    get_dns_info "$2" "$domain"
+else
+    for subdomain in www lb-01 web-01 web-02; do
+        get_dns_info "$subdomain" "$domain"
+    done
+fi
