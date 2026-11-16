@@ -1,0 +1,24 @@
+global
+    maxconn 2048
+    user haproxy
+    group haproxy
+    daemon
+    tune.ssl.default-dh-param 2048
+
+defaults
+    mode http
+    option forwardfor
+    timeout connect 5000ms
+    timeout client  50000ms
+    timeout server  50000ms
+
+frontend http-in
+    bind *:80
+    bind *:443 ssl crt /etc/haproxy/certs/chrisswebstack.work.gd.pem
+    http-request redirect scheme https code 301 unless { ssl_fc }
+    default_backend web-backend
+
+backend web-backend
+    balance roundrobin
+    server web-01 35.178.147.142:80 check
+    server web-02 16.60.178.95:80 check
